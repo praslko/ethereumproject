@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<title>Document</title>
+	
+<style>
+table, th, td {
+		border: 1px solid black;
+}	
+</style>
+
+<script>
+function timeConverter(UNIX_timestamp){
+  var a = new Date(UNIX_timestamp * 1000);
+  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var year = a.getFullYear();
+  var month = months[a.getMonth()];
+  var date = a.getDate();
+  var hour = a.getHours();
+  var min = a.getMinutes();
+  var sec = a.getSeconds();
+  var time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min + ':' + sec ;
+  return time;
+}
+</script>
+
+</head>
+<body>
+<div>
+		   
+<h1>Bounty Portal</h1>
+<p id="msgContractState">  </p> 
+<div>	
+<h4 > You are logged into DApp using following Externally Owned Account (EOA): <h4>
+
+<font color="blue"><h5 id="LoggedInEOA"> ***Not logged in***: <h5></font>
+
+<h6 > Note: To log into DApp using a different EOA, switch account in Metamask GUI and refresh this page <h6>
+
+</div>  
+
+<div>
+<button id="button_page_refresh">Refresh this page</button>
+</div>
+	    
+<hr>
+
+<p id="msgNotAuthorized">  </p> 
+
+<fieldset>
+  <legend>For Bounty Issuers (Job Posters)</legend>		  
+<div>
+<label for="name">Bounty Description</label>
+<input id="bounty_sow" type="text">
+	
+<label for="name">Bounty Reward</label>
+<input id="bounty_reward" type="number" min="1" step="1" oninput="validity.valid||(value='');">
+<button id="button_create_bounty">Create Bounty</button>
+</div>
+
+<div>
+<label for="name">Bounty ID</label>
+<input id="bounty_id_to_be_enabled" type="number" min="0" step="1" oninput="validity.valid||(value='');">
+		
+<button id="button_enable_bounty">Enable Bounty</button>
+</div>
+
+<div>
+<label for="name">Bounty ID</label>
+<input id="bounty_id_for_review" type="number" min="0" step="1" oninput="validity.valid||(value='');">
+
+<label for="name">Bounty Work ID</label>
+<input id="bounty_execution_id_to_view" type="number" min="0" step="1" oninput="validity.valid||(value='');">
+
+<button id="button_get_bounty_execution_details">Review Proposed Work Submission</button>
+</div>
+
+<div>
+<label for="name">Bounty ID</label>
+<input id="bounty_id_under_review" type="number" min="0" step="1" oninput="validity.valid||(value='');">
+
+<label for="name">Bounty Work ID</label>
+<input id="bounty_execution_id_to_be_accepted" type="number" min="0" step="1" oninput="validity.valid||(value='');">
+
+<button id="button_accept_bounty_execution">Accept Bounty Work</button>
+</div>
+</fieldset>
+
+<br>
+
+<fieldset>
+  <legend>For Bounty Executors (Job Hunters)</legend>
+<div>
+<label for="name">Bounty ID</label>
+<input id="bounty_id_to_be_executed" type="number" min="0" step="1" oninput="validity.valid||(value='');">
+
+<label for="name">Bounty Work</label>
+<input id="bounty_sow_response" type="text">
+		
+<button id="button_execute_bounty">Submit Work for Bounty</button>
+</div>
+
+<div>
+<label for="name">Bounty ID</label>
+<input id="bounty_id_for_reward_collect" type="number" min="0" step="1" oninput="validity.valid||(value='');">
+
+<label for="name">Bounty Work ID</label>
+<input id="bounty_execution_id_for_which_reward_to_be_collected" type="number" min="0" step="1" oninput="validity.valid||(value='');">
+
+<button id="button_collect_bounty_reward">Collect Bounty Reward</button>
+</div>
+</fieldset>	
+
+<hr>
+<p id="msgAuthorized"> </p>
+
+<form>
+<fieldset>
+  <legend>For Contract Owner</legend>
+
+<div>
+<button id="button_stop_contract">Stop Contract</button>
+</div>
+
+<div>
+<button id="button_resume_contract">Resume Contract</button>
+</div>
+
+<div>
+<button id="button_get_contract_balance">Know Contract Balance</button>
+</div>
+
+<div>
+<button id="button_withdraw_contract_balance">Withdraw Contract Balance</button>
+</div>
+
+</fieldset>
+</form>
+
+<hr>
+<div>	
+<h3> Master List of all Bounties </h3>
+<h5>
+<font color="blue">
+<p id="BountyCount">Total # of bounties: </p>
+</font>
+</h5>
+<p id="BountyDesc"></p>
+</div>  
+
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+	
+<script>
+if (typeof web3 !== 'undefined') {
+	web3 = new Web3(web3.currentProvider);
+} else {
+	// set the provider you want from Web3.providers
+	web3 = new Web3(new 	Web3.providers.HttpProvider("http://localhost:8545"));
+}
+	
+//web3.eth.defaultAccount = web3.eth.accounts[2];
+		
+var abi = [
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "getBountyCount",
+		"outputs": [
+			{
+				"name": "_numBounties",
+				"type": "uint16"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [],
+		"name": "stopContract",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "_bountyId",
+				"type": "uint16"
+			}
+		],
+		"name": "getBountyExecutionCount",
+		"outputs": [
+			{
+				"name": "",
+				"type": "uint16"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "getContractOwner",
+		"outputs": [
+			{
+				"name": "",
+				"type": "address"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_bountyId",
+				"type": "uint16"
+			},
+			{
+				"name": "_bountyExecutionId",
+				"type": "uint16"
+			}
+		],
+		"name": "collectBountyReward",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_bountyId",
+				"type": "uint16"
+			},
+			{
+				"name": "_bountyExecutionData",
+				"type": "string"
+			}
+		],
+		"name": "executeBounty",
+		"outputs": [],
+		"payable": true,
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "isContractStopped",
+		"outputs": [
+			{
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "getContractBalance",
+		"outputs": [
+			{
+				"name": "contract_balance",
+				"type": "uint256"
+			},
+			{
+				"name": "withdrawable_balance",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_bountyId",
+				"type": "uint16"
+			},
+			{
+				"name": "_bountyExecutionId",
+				"type": "uint16"
+			}
+		],
+		"name": "acceptBountyExecution",
+		"outputs": [],
+		"payable": true,
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_bountyId",
+				"type": "uint16"
+			}
+		],
+		"name": "enableBounty",
+		"outputs": [],
+		"payable": true,
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_bountyData",
+				"type": "string"
+			},
+			{
+				"name": "_bountyReward",
+				"type": "uint256"
+			}
+		],
+		"name": "createBounty",
+		"outputs": [
+			{
+				"name": "_numBounties",
+				"type": "uint16"
+			}
+		],
+		"payable": true,
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [],
+		"name": "withdrawContractBalance",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [],
+		"name": "resumeContract",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "_bountyId",
+				"type": "uint16"
+			}
+		],
+		"name": "getBountyDetails",
+		"outputs": [
+			{
+				"name": "",
+				"type": "uint16"
+			},
+			{
+				"name": "",
+				"type": "address"
+			},
+			{
+				"name": "",
+				"type": "string"
+			},
+			{
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"name": "",
+				"type": "uint16"
+			},
+			{
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "_bountyId",
+				"type": "uint16"
+			},
+			{
+				"name": "_bountyExecutionId",
+				"type": "uint16"
+			}
+		],
+		"name": "getBountyExecution",
+		"outputs": [
+			{
+				"name": "",
+				"type": "bool"
+			},
+			{
+				"name": "",
+				"type": "address"
+			},
+			{
+				"name": "",
+				"type": "string"
+			},
+			{
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"name": "_bountyPortalOwner",
+				"type": "address"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"name": "_bountyId",
+				"type": "uint16"
+			}
+		],
+		"name": "LogBountyCreated",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"name": "_bountyId",
+				"type": "uint16"
+			},
+			{
+				"indexed": false,
+				"name": "_oldstatus",
+				"type": "uint8"
+			},
+			{
+				"indexed": false,
+				"name": "_newstatus",
+				"type": "uint8"
+			}
+		],
+		"name": "LogBountyStatusChanged",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"name": "_bountyId",
+				"type": "uint16"
+			},
+			{
+				"indexed": false,
+				"name": "_executor",
+				"type": "address"
+			}
+		],
+		"name": "LogBountyExecuted",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"name": "_bountyId",
+				"type": "uint16"
+			},
+			{
+				"indexed": false,
+				"name": "_bountyExecutionId",
+				"type": "uint16"
+			}
+		],
+		"name": "LogBountyExecutionAccepted",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"name": "_executor",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"name": "_reward",
+				"type": "uint256"
+			}
+		],
+		"name": "LogRewardCollected",
+		"type": "event"
+	}
+]
+
+var BountyPortalContract = web3.eth.contract(abi);
+// NOTE: Address value in following statement may need to be changed to match the address where contract was deployed
+//       using truffle migrate command
+var BountyPortalContractAddress = "0x18b97e6bcb28f177a1ebf57b356c191db8b34ce0";
+var BountyPortal = BountyPortalContract.at(BountyPortalContractAddress);
+console.log(BountyPortal);    
+var user_EOA_address = "";
+var contract_owner_address = "";
+var is_contract_stopped = false;
+var HTML_BountyRecord = "";
+
+BountyPortal.getContractOwner.call(function(error, result) {
+	if(!error) { 
+		console.log("getContractOwner Pass");
+	        console.log(result); 
+		contract_owner_address = result;
+		
+		document.getElementById("msgNotAuthorized").innerHTML = ("<h5> Bounty Portal contract owner " + result + " NOT AUTHORIZED to perform following operations <h5>");
+		document.getElementById("msgAuthorized").innerHTML = ("<h5> ONLY Bounty Portal contract owner " + result + " AUTHORIZED to perform following operations <h5>");
+	} else {
+		console.log("getContractOwner Fail");
+	        console.error(error);
+	}
+});
+
+
+BountyPortal.isContractStopped.call(function(error, result) {
+	if(!error) { 
+		console.log("isContractStopped Pass");
+	        console.log(result); 
+		is_contract_stopped = result;
+		if (is_contract_stopped == true) {
+			document.getElementById("msgContractState").innerHTML = ("<font color=\"red\"> <h3>Contract state: STOPPED </h3></font> <font color=\"blue\"><h5>Resume Contract to allow other operations</h5></font>");
+		} else {
+			document.getElementById("msgContractState").innerHTML = ("<font color=\"green\"> <h3>Contract state: NOT STOPPED </h3></font>");
+		}
+		//setPageControlsVisibility(is_contract_stopped);
+	} else {
+		console.log("isContractStopped Fail");
+	        console.error(error);
+	}
+});
+
+
+function setPageControlsVisibility(is_contract_stopped, user_EOA_address, contract_owner_address) {
+	if (is_contract_stopped == true) {
+		document.getElementById("button_create_bounty").disabled = true;
+		document.getElementById("button_enable_bounty").disabled = true;
+		document.getElementById("button_get_bounty_execution_details").disabled = true;
+		document.getElementById("button_accept_bounty_execution").disabled = true;
+		document.getElementById("button_execute_bounty").disabled = true;
+		document.getElementById("button_collect_bounty_reward").disabled = true;
+		document.getElementById("button_stop_contract").disabled = true;
+		document.getElementById("button_withdraw_contract_balance").disabled = true;
+		
+		if (user_EOA_address != contract_owner_address) {		
+			document.getElementById("button_resume_contract").disabled = true;
+			document.getElementById("button_get_contract_balance").disabled = true;
+		} else {
+			document.getElementById("button_resume_contract").disabled = false;
+			document.getElementById("button_get_contract_balance").disabled = false;
+		}
+
+		document.getElementById("bounty_sow").disabled = true;
+		document.getElementById("bounty_reward").disabled = true;
+		document.getElementById("bounty_id_to_be_enabled").disabled = true;
+		document.getElementById("bounty_id_for_review").disabled = true;
+		document.getElementById("bounty_id_under_review").disabled = true;
+		document.getElementById("bounty_execution_id_to_view").disabled = true;
+		document.getElementById("bounty_execution_id_to_be_accepted").disabled = true;
+		document.getElementById("bounty_id_to_be_executed").disabled = true;
+		document.getElementById("bounty_sow_response").disabled = true;
+		document.getElementById("bounty_id_for_reward_collect").disabled = true;
+		document.getElementById("bounty_execution_id_for_which_reward_to_be_collected").disabled = true;
+	} else {
+		if (user_EOA_address != contract_owner_address) {
+			document.getElementById("button_create_bounty").disabled = false;
+			document.getElementById("button_enable_bounty").disabled = false;
+			document.getElementById("button_get_bounty_execution_details").disabled = false;
+			document.getElementById("button_accept_bounty_execution").disabled = false;
+			document.getElementById("button_execute_bounty").disabled = false;
+			document.getElementById("button_collect_bounty_reward").disabled = false;
+
+			document.getElementById("button_stop_contract").disabled = true;
+			document.getElementById("button_withdraw_contract_balance").disabled = true;
+			document.getElementById("button_get_contract_balance").disabled = true;
+			document.getElementById("button_resume_contract").disabled = true;
+		
+			document.getElementById("bounty_sow").disabled = false;
+			document.getElementById("bounty_reward").disabled = false;
+			document.getElementById("bounty_id_to_be_enabled").disabled = false;
+			document.getElementById("bounty_id_for_review").disabled = false;
+			document.getElementById("bounty_id_under_review").disabled = false;
+			document.getElementById("bounty_execution_id_to_view").disabled = false;
+			document.getElementById("bounty_execution_id_to_be_accepted").disabled = false;
+			document.getElementById("bounty_id_to_be_executed").disabled = false;
+			document.getElementById("bounty_sow_response").disabled = false;
+			document.getElementById("bounty_id_for_reward_collect").disabled = false;
+			document.getElementById("bounty_execution_id_for_which_reward_to_be_collected").disabled = false;
+		} else {
+			document.getElementById("button_create_bounty").disabled = true;
+			document.getElementById("button_enable_bounty").disabled = true;
+			document.getElementById("button_get_bounty_execution_details").disabled = true;
+			document.getElementById("button_accept_bounty_execution").disabled = true;
+			document.getElementById("button_execute_bounty").disabled = true;
+			document.getElementById("button_collect_bounty_reward").disabled = true;
+
+			document.getElementById("button_stop_contract").disabled = false;
+			document.getElementById("button_withdraw_contract_balance").disabled = false;
+			document.getElementById("button_get_contract_balance").disabled = false;
+			document.getElementById("button_resume_contract").disabled = false;
+		
+			document.getElementById("bounty_sow").disabled = true;
+			document.getElementById("bounty_reward").disabled = true;
+			document.getElementById("bounty_id_to_be_enabled").disabled = true;
+			document.getElementById("bounty_id_for_review").disabled = true;
+			document.getElementById("bounty_id_under_review").disabled = true;
+			document.getElementById("bounty_execution_id_to_view").disabled = true;
+			document.getElementById("bounty_execution_id_to_be_accepted").disabled = true;
+			document.getElementById("bounty_id_to_be_executed").disabled = true;
+			document.getElementById("bounty_sow_response").disabled = true;
+			document.getElementById("bounty_id_for_reward_collect").disabled = true;
+			document.getElementById("bounty_execution_id_for_which_reward_to_be_collected").disabled = true;
+		}
+	}
+}
+BountyPortal.getBountyCount.call(function(error, result) {
+	if(!error) {
+		user_EOA_address = web3.eth.accounts[0]; 
+
+		setPageControlsVisibility(is_contract_stopped, user_EOA_address, contract_owner_address);
+		document.getElementById("LoggedInEOA").innerHTML = web3.eth.accounts[0];  
+		console.log("getBountyCount Pass: " + result);
+		document.getElementById("BountyCount").innerHTML += result;
+		var i;
+		for (i = 0; i < result; i++) { 	
+			BountyPortal.getBountyDetails.call(i, {from: user_EOA_address}, function(err, res) { 
+				if(!err) {
+        				var bounty_status = "";
+					var bounty_cutoff = timeConverter(res[6].toNumber());
+					if (res[5].toNumber() == 0) {
+						bounty_status = "Draft - Not yet accepting executions";
+						bounty_cutoff = "Not Applicable";
+					} else if (res[5].toNumber() == 1) {
+						bounty_status = "Active - Accepting executions";
+					} else if (res[5].toNumber() == 2) {
+						bounty_status = "Closed = No more accepting executions";
+					} else {
+						bounty_status = "Unknown";
+					}
+
+					HTML_BountyRecord = "<table>";
+					HTML_BountyRecord  += "<tr>";
+					HTML_BountyRecord += "<td> Bounty Id </td>";
+
+					HTML_BountyRecord += "<td>" + res[0].toNumber().toString() + "</td>";
+					HTML_BountyRecord  += "</tr>";
+
+					HTML_BountyRecord  += "<tr>";
+					HTML_BountyRecord += "<td> Issuer </td>";
+
+					HTML_BountyRecord  += "<td>" + res[1] + "</td>";
+					HTML_BountyRecord  += "</tr>";
+
+					HTML_BountyRecord  += "<tr>";
+					HTML_BountyRecord += "<td> SOW </td>";
+					HTML_BountyRecord  += "<td>" + res[2] + "</td>";
+					HTML_BountyRecord  += "</tr>";
+
+					HTML_BountyRecord  += "<tr>";
+					HTML_BountyRecord += "<td> Reward (wei) </td>";
+					HTML_BountyRecord  += "<td>" + res[3].toNumber().toString() + "</td>";
+					HTML_BountyRecord  += "</tr>";
+
+					HTML_BountyRecord  += "<tr>";
+					HTML_BountyRecord += "<td> Execution Count </td>";
+					HTML_BountyRecord += "<td>" + res[4].toNumber().toString() + "</td>";
+					HTML_BountyRecord  += "</tr>";
+
+					HTML_BountyRecord  += "<tr>";
+					HTML_BountyRecord += "<td> Status </td>";
+					HTML_BountyRecord += "<td>" + bounty_status + "</td>";
+					HTML_BountyRecord  += "</tr>";
+
+					HTML_BountyRecord  += "<tr>";
+					HTML_BountyRecord += "<td> Cut off Date & Time </td>";
+					HTML_BountyRecord += "<td>" + bounty_cutoff + "</td>";
+
+					HTML_BountyRecord += "</tr>" ;
+					HTML_BountyRecord += "</table>";
+					HTML_BountyRecord += "<br/>";
+					document.getElementById("BountyDesc").innerHTML += HTML_BountyRecord; 
+				} else { // if (!err)
+					console.log(err);
+				} // if (!err)
+			}); // getBountyDetails
+		} // for	
+	} else { // if (!error) console.log("getBountyCount Fail: " );
+		console.error(error);
+	} // if (!error)
+}); // getBountyCount
+console.log(HTML_BountyRecord); 		
+
+
+$("#button_page_refresh").click(function() {
+	location.reload();
+});
+
+$("#button_create_bounty").click(function() {
+	BountyPortal.createBounty.sendTransaction(document.getElementById("bounty_sow").value.trim(), document.getElementById("bounty_reward").value, {from: user_EOA_address, value: document.getElementById("bounty_reward").value+1}, function(error, result) {
+		       if(!error) { 
+				console.log("createBounty Pass");
+	             		console.log(result); 
+			}
+	            	else {
+				console.log("createBounty Fail");
+	                	console.error(error);
+			}
+	        });
+	});
+
+$("#button_enable_bounty").click(function() {
+	BountyPortal.enableBounty.sendTransaction(document.getElementById("bounty_id_to_be_enabled").value, {from: user_EOA_address, value: 1}, function(error, result) {
+		       if(!error) { 
+		       		console.log("enableBounty Pass");
+	             		console.log(result); 
+			}
+	            	else {
+				console.log("enableBounty Fail");
+	                	console.error(error);
+			}
+	        });
+	});
+
+
+$("#button_get_bounty_execution_details").click(function() {
+	var bountyId = document.getElementById("bounty_id_for_review").value;
+	var bountyExecutionId = document.getElementById("bounty_execution_id_to_view").value;
+	BountyPortal.getBountyExecution.call(bountyId, bountyExecutionId, {from: user_EOA_address}, function(error, result) {
+			if(!error) { 
+				console.log(result); 
+				var strBountyExecutionDetails = "Work Details for Bounty Id " + bountyId + " and Work Id: " + bountyExecutionId + "\n";
+				strBountyExecutionDetails += "Job Hunter: " + result[1];
+				strBountyExecutionDetails += "\n";
+				
+				strBountyExecutionDetails += "Submission Content: " + result[2];
+				strBountyExecutionDetails += "\n";
+
+				if (result[0] == false) {
+					strBountyExecutionDetails += "Work Status: Not Accepted Yet by Issuer"; 
+				} else {
+					strBountyExecutionDetails += "Work Status: Accepted by Issuer"; 
+				}
+				
+				strBountyExecutionDetails += "\n";
+				strBountyExecutionDetails += "Reward eligibility for Job Hunter : " + result[3] + " wei";
+				strBountyExecutionDetails += "\n";
+				window.alert(strBountyExecutionDetails);	
+	            	} else {
+				console.log("getBountyExecution Fail");
+	                	console.error(error);
+			}
+		});	
+	});
+
+
+
+$("#button_accept_bounty_execution").click(function() {
+	BountyPortal.acceptBountyExecution.sendTransaction(document.getElementById("bounty_id_under_review").value, document.getElementById("bounty_execution_id_to_be_accepted").value, {from: user_EOA_address, value: 1}, function(error, result) {
+		       if(!error) { 
+		       		console.log("acceptBountyExecution Pass");
+	             		console.log(result); 
+			} else {
+				console.log("acceptBountyExecution Fail");
+	                	console.error(error);
+			}
+	        });	
+	});
+
+$("#button_execute_bounty").click(function() {
+	BountyPortal.executeBounty.sendTransaction(document.getElementById("bounty_id_to_be_executed").value, document.getElementById("bounty_sow_response").value, {from: user_EOA_address, value: 1}, function(error, result) {
+		       if(!error) { 
+		       		console.log("executeBounty Pass");
+	             		console.log(result); 
+			} else {
+				console.log("executeBounty Fail");
+	                	console.error(error);}
+	        	});
+	});
+
+$("#button_collect_bounty_reward").click(function() {
+	BountyPortal.collectBountyReward.sendTransaction(document.getElementById("bounty_id_for_reward_collect").value, document.getElementById("bounty_execution_id_for_which_reward_to_be_collected").value, {from: user_EOA_address}, function(error, result) {
+			if(!error) { 
+				console.log("collectBountyReward Pass");
+				console.log(result); 
+			} else {
+				console.log("collectBountyReward Fail");
+		                console.error(error);
+			}
+		});
+	});
+
+$("#button_stop_contract").click(function() {
+			if (user_EOA_address != contract_owner_address) {
+				window.alert("You are not authorized to stop Contract");
+				return;		
+			} 
+
+			if (is_contract_stopped == true) {
+				window.alert("Contract is already in STOPPED State. No need to stop again");
+				return;		
+			}
+        		BountyPortal.stopContract.sendTransaction({from: user_EOA_address}, function(error, result) {
+			if(!error) { 
+				window.alert("Contract is Stopped now. No other operation allowed. Resume contract to allow other operations");
+				console.log("stopContract Pass");
+				console.log(result); 
+			} else {
+				console.log("stopContract Fail");
+				console.error(error);
+			}
+		});
+	});
+
+$("#button_resume_contract").click(function() {
+			if (user_EOA_address != contract_owner_address) {
+				window.alert("You are not authorized to resume Contract");
+				return;		
+			} 
+
+			if (is_contract_stopped == false) {
+				window.alert("Contract is already in NOT STOPPED State. No need to resume");
+				return;		
+			}
+			BountyPortal.resumeContract.sendTransaction({from: user_EOA_address}, function(error, result) {
+			if(!error) { 
+				window.alert("Contract is Resumed now. Other operations allowed. Stop contract to prevent other operations");
+		
+				console.log("resumeContract Pass");
+				console.log(result); 
+			} else {
+				console.log("resumeContract Fail");
+				console.error(error);
+			}
+		});
+	});
+
+$("#button_get_contract_balance").click(function() {
+			if (user_EOA_address != contract_owner_address) {
+				window.alert("You are not authorized to know Contract balance");
+				return;		
+			}
+
+			BountyPortal.getContractBalance.call({from: user_EOA_address}, function(error, result) {
+			if(!error) { 
+				console.log("getContractBalance Pass"); 
+				window.alert("Overall Contract Balance is " + result[0] + " wei" + "\n" + "Contract Balance withdrawable by contract owner is " + result[1] + " wei");
+				console.log(result); 
+			} else {
+				console.log("getContractBalance Fail");
+		        	console.error(error);
+			}
+		});
+	});
+
+$("#button_withdraw_contract_balance").click(function() {
+			if (user_EOA_address != contract_owner_address) {
+				window.alert("You are not authorized to withdraw Contract balance");
+				return;		
+			}
+
+			if (is_contract_stopped == true) {
+				window.alert("Contract is in Stopped State. Balance cannot be withdrawn");
+				return;		
+			}
+
+			BountyPortal.withdrawContractBalance.sendTransaction({from: user_EOA_address}, function(error, result) {
+			if(!error) { 
+				console.log("withdrawContractBalance Pass");
+				console.log(result); 
+			} else {
+				console.log("withdrawContractBalance Fail");
+		        	console.error(error);
+			}
+		});
+	});
+
+</script>
+	
+</body>
+</html>

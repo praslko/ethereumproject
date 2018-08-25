@@ -1,0 +1,17 @@
+{
+  "package_name": "LibraryDemo",
+  "version": "0.0.1",
+  "description": "Contract for LibraryDemo",
+  "authors": [
+    "Prashant Saxena <pras.lko@gmail.com>"
+  ],
+  "keywords": [
+    "ethereum",
+    "Library",
+    "LibraryDemo"
+  ],
+  "dependencies": {
+    "bytes": "^0.0.5"
+  },
+  "license": "MIT"
+}
