@@ -125,8 +125,7 @@ Step 2.14: Start interacting with the dApp. Refer to user stories for details on
 ## Steps 3.1 to 3.4 explain how to connect to contract on Rinkeby test network
 
 Step 3.1: Run  command "npm run dev" while ensuring you are in BountyPortal directory
-Step 3.2: Launch chrome browser and type in following URL in address bar to access dAPP GUI http://localhost:3000 
-Step 3.3: Launch metamask GUI from chrome browser and connect to Rinkeby network 
+Step 3.2: Launch metamask GUI from chrome browser and connect to Rinkeby network 
 Step 3.3: Launch chrome browser and type in following URL in address bar to access dAPP GUI http://localhost:3000 
 Step 3.4: Start interacting with the dApp. Refer to user stories for details on interaction
 
