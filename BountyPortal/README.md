@@ -48,7 +48,7 @@ Refer to User Stories for details
 
 ## How to set it up in development environment
 
-Step 1: Ensure following pre-requisite software is installed on your machine
+Step 1: Ensure following pre-requisite software is installed on your machine. Refer to step 2.1a
 * truffle
 * ganache
 * metamask (chrome extension)
@@ -70,10 +70,12 @@ Step 1: Ensure following pre-requisite software is installed on your machine
 
 Step 2.1: cd to BountyPortal Directory
 
+Step 2.1a: run command "npm install"
+
 Step 2.2: If you are on windows operating system then delete file truffle.js. If you are on unix operating system then delete file truffle-config.js
           Refer to for https://ethereum.stackexchange.com/questions/38117/truffle-configuration-file-name-is-it-truffle-js-or-truffle-config-js details
 
-Step 2.3: Ensure that either directory BountyPortal\\build\\contracts does not exist or if it exists is empty
+Step 2.3: Ensure that either directory BountyPortal\build\contracts does not exist or if it exists is empty
 
 Step 2.4: Run command "truffle compile"
 
@@ -86,9 +88,9 @@ Step 2.6: Open file BountyPortal/migrations/2_deploy_contracts.js in any text ed
 
 Step 2.7: Run command "truffle compile" while ensuring that your current directory is BountyPortal
                  Your command output will look similar to below
-                  Compiling .\\contracts\\BountyPortal.sol...
- 		Compiling .\\contracts\\Migrations.sol...
- 		Writing artifacts to .\\build\\contracts
+                  Compiling .\contracts\BountyPortal.sol...
+ 		Compiling .\contracts\Migrations.sol...
+ 		Writing artifacts to .\build\contracts
 
 Step 2.8: : Run command "truffle migrate" while ensuring that your current directory is BountyPortal
  		Your command output will look similar to below
@@ -113,9 +115,9 @@ Step 2.9: In the output generated at Step 2.8, take note of the address at which
 Step 2.10: Open file BountyPortal\src\index.html in any text editor and edit line 500 to  ensure that it has same address that was taken note of at Step 2.9. Save the file.
  	   Currently file is using address on Rinkeby network
 	
-Step 2.11: Run  command "npm run dev" while ensuring you are in BountyPortal directory
+Step 2.11: Run command "npm run dev" while ensuring you are in BountyPortal directory
 
-Step 2.12: Launch metamask GUI from chrome browser and set 			network to http://127.0.0.1:7545. Metamask GUI  
+Step 2.12: Launch metamask GUI from chrome browser and set network to http://127.0.0.1:7545. Metamask GUI  
            should show that it is connected to Private Network
 
 Step 2.13: Launch chrome browser and type in following URL in address bar to access dAPP GUI http://localhost:3000 
