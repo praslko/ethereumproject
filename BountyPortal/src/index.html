@@ -672,12 +672,12 @@ BountyPortal.getBountyCount.call(function(error, result) {
         				var bounty_status = "";
 					var bounty_cutoff = timeConverter(res[6].toNumber());
 					if (res[5].toNumber() == 0) {
-						bounty_status = "Draft - Not yet accepting executions";
+						bounty_status = "Draft - Not yet accepting work submissions";
 						bounty_cutoff = "Not Applicable";
 					} else if (res[5].toNumber() == 1) {
-						bounty_status = "Active - Accepting executions";
+						bounty_status = "Active - Accepting work submissions";
 					} else if (res[5].toNumber() == 2) {
-						bounty_status = "Closed = No more accepting executions";
+						bounty_status = "Closed = No more accepting work submisisons";
 					} else {
 						bounty_status = "Unknown";
 					}
