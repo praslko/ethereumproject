@@ -536,8 +536,10 @@ var abi = [
 
 var BountyPortalContract = web3.eth.contract(abi);
 // NOTE: Address value in following statement may need to be changed to match the address where contract was deployed
-//       using truffle migrate command
-var BountyPortalContractAddress = "0x18b97e6bcb28f177a1ebf57b356c191db8b34ce0";
+//       using truffle migrate command. 0xd5fab6c620fdf818aee38759f772b162488f7c74 is contract address on Rinkeby
+//       "0x18b97e6bcb28f177a1ebf57b356c191db8b34ce0" is contract address in my development environment.
+
+var BountyPortalContractAddress = "0xd5fab6c620fdf818aee38759f772b162488f7c74"; //"0x18b97e6bcb28f177a1ebf57b356c191db8b34ce0";
 var BountyPortal = BountyPortalContract.at(BountyPortalContractAddress);
 console.log(BountyPortal);    
 var user_EOA_address = "";

@@ -1,0 +1,6 @@
+Etherscan link is https://rinkeby.etherscan.io/tx/0xa06d431bcce064a3cc5f0950d79e6b24af6a119916991336b05c2c88f9f23bd7
+
+Contract address on  rinkeby: 0xd5fab6c620fdf818aee38759f772b162488f7c74 
+0x2a04CEfE3bdFE0714122C8B68e4AcDE4140B2d1F is contract owner
+
+
