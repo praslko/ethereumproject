@@ -6,6 +6,9 @@ Implement Bounty dAPP
 Implements smart contract (written in solidity) and a Javascript UI to provide following features. 
 Test cases have been written in Javascript
 
+Contract has been deployed successfully on Rinkeby test network using Remix. I ran into issues depoying contract on Rinkeby using truffle and Infura. Refer to file deployed_addresses.txt to know contract details on rinkeby network
+
+Contract allows
 * Allows job posters to create new bounty
 * Allows job hunters to submit work for a bounty 
 * Allows job posters to review  submitted work and accept work. Acceptance of a work automatically implies rejection of other works for same bounty
@@ -63,6 +66,8 @@ Step 1: Ensure following pre-requisite software is installed on your machine
   ### node.js version: 10.4.1
   ### lite-server version: 2.4.0	
 
+## Steps 2.1 to 2.14 explain how to set up and connect to contract in local development environment
+
 Step 2.1: cd to BountyPortal Directory
 
 Step 2.2: If you are on windows operating system then delete file truffle.js. If you are on unix operating system then delete file truffle-config.js
@@ -106,17 +111,24 @@ Step 2.8: : Run command "truffle migrate" while ensuring that your current direc
 Step 2.9: In the output generated at Step 2.8, take note of the address at which  BountyPortal  contract is deployed (e.g. in above output address at which  		BountyPortal contract is  deployed is  0x18b97e6bcb28f177a1ebf57b356c191db8b34ce0)
 
 Step 2.10: Open file BountyPortal\src\index.html in any text editor and edit line 500 to  ensure that it has same address that was taken note of at Step 2.9. Save the file.
- 	  This step is only needed if BountyPortal contract is deployed at an address  that  is  different from 0x18b97e6bcb28f177a1ebf57b356c191db8b34ce0
-
+ 	   Currently file is using address on Rinkeby network
+	
 Step 2.11: Run  command "npm run dev" while ensuring you are in BountyPortal directory
 
 Step 2.12: Launch metamask GUI from chrome browser and set 			network to http://127.0.0.1:7545. Metamask GUI  
            should show that it is connected to Private Network
 
-Step 2.13: Launch chrome browser and type in following URL in address bar to access dAPP GUI
-http://localhost:3000 
+Step 2.13: Launch chrome browser and type in following URL in address bar to access dAPP GUI http://localhost:3000 
 
 Step 2.14: Start interacting with the dApp. Refer to user stories for details on interaction
+
+## Steps 3.1 to 3.4 explain how to connect to contract on Rinkeby test network
+
+Step 3.1: Run  command "npm run dev" while ensuring you are in BountyPortal directory
+Step 3.2: Launch chrome browser and type in following URL in address bar to access dAPP GUI http://localhost:3000 
+Step 3.3: Launch metamask GUI from chrome browser and connect to Rinkeby network 
+Step 3.3: Launch chrome browser and type in following URL in address bar to access dAPP GUI http://localhost:3000 
+Step 3.4: Start interacting with the dApp. Refer to user stories for details on interaction
 
 
 ## Actors in BountyPortal
