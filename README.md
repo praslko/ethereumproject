@@ -1,8 +1,8 @@
 ## Project Objective
 
-Implement Bounty dAPP
+Implement Bounty dAPP. Also implement LibraryDemo.sol (to demonstrate use of ethPM)
 
-## What does Project do
+## What does Bounty Project do
 Implements smart contract (written in solidity) and a Javascript UI to provide following features. 
 
 * Allows job posters to create new bounty
