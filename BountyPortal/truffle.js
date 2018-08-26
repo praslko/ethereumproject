@@ -13,7 +13,7 @@
  */
 
 var HDWalletProvider = require("truffle-hdwallet-provider");
-// 12 word mnemonic
+// 12 word mnemonic Removed before checking in as it is secret
 var mnemonic = "";
 
 module.exports = {
