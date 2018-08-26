@@ -290,7 +290,7 @@ Keying in invalid indices in input fields should result in an error. Indices are
 #### Acceptance Criteria: 
 	
 Total count of bounties should remain unchanged.
-Status of bounty for which work was accepted should remain as Closed. Reward value of bounty for which was work was accepted should remain unchanged
+Status of bounty for which work was accepted should remain as Closed. Reward value of bounty for which work was accepted should remain unchanged
      
 Checking Bounty Work details (refer to story #10) should show that reward eligibility of job hunter has changed from a non-zero value to 0 (because ether has been transferred already and no more ether pertaining to this work submission remains to be transferred to job hunter)
 
@@ -312,7 +312,7 @@ Keying in invalid indices in input fields should result in an error. Indices are
 	if contract is Stopped State then buttons Resume Contract, Know Contract Balance remain enabled but buttons Stop Contract, Withdraw Contract Balance get disabled.
 
 Total count of bounties should remain unchanged.
-Status of bounty for which was accepted should remain as Closed. Reward value of bounty for which was work was accepted should remain unchanged
+Status of bounty for which work was accepted should remain as Closed. Reward value of bounty for which work was accepted should remain unchanged
      
 Checking Bounty Work details (refer to story #10) should show that reward eligibility of job hunter has changed from a non-zero value to 0 (because ether has been transferred already and no more ether pertaining to this work submission remains to be transferred to job hunter)
 
