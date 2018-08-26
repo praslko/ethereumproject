@@ -14,7 +14,7 @@ it("test: get instance of contract", async () => {
 	}
 })
 
-it('test: Create a Bounty by issuer#1', async () => {
+it('test: Create a Bounty by issuer#1 should succeed', async () => {
 	try { 
 		var obj = await bountyPortalInstance.createBounty("Prob01_01", 10, {from: issuer1, value: 11})
 		//console.log (obj.logs[0].args._bountyId.toNumber())
@@ -23,7 +23,17 @@ it('test: Create a Bounty by issuer#1', async () => {
 	} catch (error) {
 		assert.fail()
 	}
-	})
+})
+
+it('test: Create a Bounty by contract owner should fail', async () => {
+	try { 
+		var obj = await bountyPortalInstance.createBounty("Prob01_01", 10, {from: owner, value: 11})
+		//console.log (obj.logs[0].args._bountyId.toNumber())
+		assert(fail);
+	} catch (error) {
+		assert(true)
+	}
+})
 
 // Ether value should be atleast 1 wei more than the bouty reward 
 
@@ -82,7 +92,7 @@ it('test: attempt to enable a non-existent Bounty should fail', async () => {
 	}	
 	})
 
-it('test: attempt to execute a Bounty by issuer of bounty should fail', async () => {
+it('test: attempt to submit work to a Bounty by issuer of bounty should fail', async () => {
 	try {
 		await bountyPortalInstance.executeBounty(1, "Resp01", {from: issuer1, value: 1})
 		assert.fail()
@@ -92,7 +102,7 @@ it('test: attempt to execute a Bounty by issuer of bounty should fail', async ()
 	})
 
 
-it('test: execute Bounty by bidder #1 should succeed', async () => {
+it('test: attempt to submit work to a Bounty by bidder #1 should succeed', async () => {
 	try {
 		await bountyPortalInstance.executeBounty(0, "Resp01", {from: bidder1, value: 1})
 		assert(true)
@@ -101,13 +111,57 @@ it('test: execute Bounty by bidder #1 should succeed', async () => {
 	}
 	})
 
-it('test: get Bounty Execution Count should give correct number', async () => {
-	var obj = await bountyPortalInstance.getBountyExecutionCount(0, {from: issuer1})
-	//console.log(obj.toNumber())
-	assert.strictEqual(obj.toNumber(), 1)
+it('test: obtain Bounty Work Submission Count should give correct number', async () => {
+	try {
+		var obj = await bountyPortalInstance.getBountyExecutionCount(0, {from: issuer1})
+		//console.log(obj.toNumber())
+		assert.strictEqual(obj.toNumber(), 1)
+	} catch (error) {
+		assert.fail()
+	}
 })
 
-it('test: attempt to execute a non-existent Bounty by a bidder should fail', async () => {
+it('test: obtain Bounty Work Submission Details by issuer of bounty should succeed', async () => {
+	try {
+		var obj = await bountyPortalInstance.getBountyExecution(0, 0, {from: issuer1})
+		//console.log(obj.toNumber())
+		assert(true)
+	} catch (error) {
+		assert.fail()
+	}
+})
+
+it('test: obtain Bounty Work Submission Details by bidder who submitted work to bounty should succeed', async () => {
+	try {
+		var obj = await bountyPortalInstance.getBountyExecution(0, 0, {from: bidder1})
+		//console.log(obj.toNumber())
+		assert(true)
+	} catch (error) {
+		assert.fail()
+	}
+})
+
+it('test: obtain Bounty Work Submission Details for non-existent work to bounty should fail', async () => {
+	try {
+		var obj = await bountyPortalInstance.getBountyExecution(0, 1, {from: bidder1}) // 2nd argument is invalid because only 1 work submission so far
+		//console.log(obj.toNumber())
+		assert.fail()
+	} catch (error) {
+		assert(true)
+	}
+})
+
+it('test: obtain Bounty Work Submission Details by bidder who is someone other than the one who submitted work to bounty should fail', async () => {
+	try {
+		var obj = await bountyPortalInstance.getBountyExecution(0, 0, {from: bidder2})
+		//console.log(obj.toNumber())
+		assert.fail()
+	} catch (error) {
+		assert(true)
+	}
+})
+
+it('test: attempt to submit work to a non-existent Bounty by a bidder should fail', async () => {
 	try {
 		await bountyPortalInstance.executeBounty(1, "Resp01", {from: bidder1, value: 1})
 		assert.fail()
@@ -116,7 +170,7 @@ it('test: attempt to execute a non-existent Bounty by a bidder should fail', asy
 	}
 	})
 
-it('test: accept Bounty Execution by anyone other than issuer of bounty should fail', async () => {
+it('test: accept Bounty Work by anyone other than issuer of bounty should fail', async () => {
 	try {
 		await bountyPortalInstance.acceptBountyExecution(0, 0, {from: issuer3, value: 1})
 		assert.fail()
@@ -125,7 +179,7 @@ it('test: accept Bounty Execution by anyone other than issuer of bounty should f
 	}
 	})
 
-it('test: accept Bounty Execution by issuer #1 without sufficient ether should fail', async () => {
+it('test: accept Bounty Work by issuer #1 without sufficient ether should fail', async () => {
 	try {
 		await bountyPortalInstance.acceptBountyExecution(0, 0, {from: issuer1, value: 0})
 		assert.fail()
@@ -134,7 +188,7 @@ it('test: accept Bounty Execution by issuer #1 without sufficient ether should f
 	}
 	})
 
-it('test: accept Bounty Execution by issuer #1 should succeed', async () => {
+it('test: accept Bounty Work by issuer #1 should succeed', async () => {
 	try {
 		await bountyPortalInstance.acceptBountyExecution(0, 0, {from: issuer1, value: 1})
 		assert(true)
@@ -146,7 +200,8 @@ it('test: accept Bounty Execution by issuer #1 should succeed', async () => {
 it('test: check Contract Balance by contract owner should succeed', async () => {
 	try {
 		var obj = await bountyPortalInstance.getContractBalance({from: owner})
-		assert.strictEqual(obj.toNumber(), 14)
+		assert.strictEqual(obj[0].toNumber(), 14) // Overall contract balance
+		assert.strictEqual(obj[1].toNumber(), 4) // Contract balance withdrawable by contract owner
 	} catch (error) {
 		assert.fail()
 	}
@@ -167,7 +222,8 @@ it('test: collect Bounty Reward by bidder 1 should succeed and contract balance 
 		assert(true)
 		try {
 			var obj = await bountyPortalInstance.getContractBalance({from: owner})
-			assert.strictEqual(obj.toNumber(), 4)
+			assert.strictEqual(obj[0].toNumber(), 4) // Overall contract balance
+			assert.strictEqual(obj[1].toNumber(), 4) // Contract balance withdrawable by contract owner
 		} catch (error) {
 			assert.fail();
 		}
@@ -178,8 +234,13 @@ it('test: collect Bounty Reward by bidder 1 should succeed and contract balance 
 })
 
 it('test: check Contract Balance again after reward collection', async () => {
-	var obj = await bountyPortalInstance.getContractBalance({from: owner})
-	assert.strictEqual(obj.toNumber(), 4)
+	try {
+		var obj = await bountyPortalInstance.getContractBalance({from: owner})
+		assert.strictEqual(obj[0].toNumber(), 4) // Overall contract balance
+		assert.strictEqual(obj[1].toNumber(), 4) // Contract balance withdrawable by contract owner
+	} catch (error) {
+		assert.fail()
+	}
 })
 
 
@@ -250,19 +311,21 @@ it('test: contract balance withdrawal by anyone other than contract owner should
 	}
 })
 
-it('test: check contract balance withdrawal by contract owner should succeed', async () => {
+it('test: contract balance withdrawal by owner should succeed', async () => {
 	try {
 		var obj = await bountyPortalInstance.withdrawContractBalance({from: owner})
-		assert(true)
-	} catch (error) {
 		assert.fail()
+	} catch (error) {
+		assert(true)
 	}
 })
+
 
 it('test: check Contract Balance again after contract owner withdraws contract Balance', async () => {
 	try {
 		var obj = await bountyPortalInstance.getContractBalance({from: owner})
-		assert.strictEqual(obj.toNumber(), 0)
+		assert.strictEqual(obj[0].toNumber(), 0) // Overall contract balance
+		assert.strictEqual(obj[1].toNumber(), 0) // Contract balance withdrawable by contract owner
 	} catch (error) {
 		assert.fail()
 	}
