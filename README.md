@@ -156,10 +156,10 @@ There are following 3 actors
 
 #### Title: Contract Owner - Resume Contract
 #### Description: 
-	Login as Contract Owner. Click Resume Contract button and bring contract to resumed state to allow issuance, execution of bounties and to allow contract owner to withdraw contract balance
+	Login as Contract Owner. Click Resume Contract button and bring contract to resumed state to allow issuance, submit work submission of bounties and to allow contract owner to withdraw contract balance
 
 #### Acceptance Criteria: 
-	When contract owner is logged in, clicking Resume Contract Button & refreshing  the page displays message that contract is Not Stopped. Thereafter attempts by other users to issue bounty,execute bounty are successful and attempt by contract owner to withdraw contract balance succeeds. Button Resume Contract in GUI becomes disabled. Remaining other controls beccome enabled as all other operations allowed in Not Stopped state
+	When contract owner is logged in, clicking Resume Contract Button & refreshing  the page displays message that contract is Not Stopped. Thereafter attempts by other users to issue bounty, submit work submissions to bounty are successful and attempt by contract owner to withdraw contract balance succeeds. Button Resume Contract in GUI becomes disabled. Remaining other controls beccome enabled as all other operations allowed in Not Stopped state
 
 ### Story 03
 
@@ -231,36 +231,36 @@ Refer to Story #3 - Contract Balance withdrawable by contract owner should incre
 
 ### Story 09
 
-#### Title: Bounty Executor - Submit Work for Bounty (i.e. submit work to a bounty as job hunter)
+#### Title: Job Hunter - Submit Work for Bounty (i.e. submit work to a bounty as job hunter)
 
 #### Description: 
-	Login as someone other than contract owner. Enter a numeric value in "Bounty ID" field. Enter a text value in Bounty Work field. Bounty id should NOT BE the id of bounty that logged in user had created. Bounty id should NOT BE the id of bounty that is in Draft state. Click Execute Bounty button. Bounty execution  should get recorded with bounty. Click Refresh this page button and see that master list shows that the bounty has been updated.
+	Login as someone other than contract owner. Enter a numeric value in "Bounty ID" field. Enter a text value in Bounty Work field. Bounty id should NOT BE the id of bounty that logged in user had created. Bounty id should NOT BE the id of bounty that is in Draft state. Click Submit Work for Bounty button. Bounty work submission should get recorded with bounty. Click Refresh this page button and see that master list shows that the bounty has been updated.
 
 #### Acceptance Criteria: 
-     Total count of bounties should remain unchanged. Status of bounty which was executed should remain as Active.
-Reward value of bounty which was executed should remain unchanged Id of bounty which was executed should remain unchanged Cutoff of bounty which was executed should remain unchanged Execution Count of bounty which was executed should go up by 1
+     Total count of bounties should remain unchanged. Status of bounty for which work was submitted should remain as Active.
+Reward value of bounty for which work was submitted should remain unchanged. Id of bounty which work was submmitted should remain unchanged. Cutoff of bounty for which work was submitted should remain unchanged. Bounty Work submission Count of bounty for which work was submitted should go up by 1
       
 Refer to Story #3 - Overall Contract Balance should increase by 1 wei
 Refer to Story #3 - Contract Balance withdrawable by contract owner should increase by 1 wei
      
-Execution of same bounty again by same user or a different user should increase execution count again. Repeat executions are allowed. Each execution is treated distinct
+Work submission to same bounty again by same user or a different user should increase work submission count again. Repeat work submissions are allowed. Each work submission is treated distinct
 	
 
 ### Story 10
 
-#### Title: Bounty Issuer - Review Proposed Work Submission(i.e. review submissions obtained for a bounty)
+#### Title: Job Poster - Review Proposed Work Submission(i.e. review submissions obtained for a bounty)
 
 #### Description: 
-	Login as someone other than contract owner. Enter numeric value in "Bounty ID" & "Bounty Execution ID" fields. Click Get Bounty Execution Details button. A pop message box should appear with work details.
+	Login as someone other than contract owner. Enter numeric value in "Bounty ID" for any of the bounties you have issued. Click Review Proposed Work Submission button. A pop message box should appear with work details.
 
 #### Acceptance Criteria: 
-	Pop up message box should show which bounty executor (i.e. job-hunter) submitted the work to bounty, the submission content that was submitted by job hunter, the status of work (whether accepted or not accepted by bounty issuer), the reward (in wei) that job hunter is eligible for. Reward shown will be 0 if bounty issuer has not accepted this work. Reward shown will be non-zero if bounty issuer has accepted this work. 
+	Pop up message box should show which job-hunter submitted the work to bounty, the submission content that was submitted by job hunter, the status of work (whether accepted or not accepted by job poster), the reward (in wei) that job hunter is eligible for. Reward shown will be 0 if job poster has not accepted this work. Reward shown will be non-zero if job poster has accepted this work. 
 	
-Keying in invalid indices in input fields should result in an error. Indices are 0-based. If logged in user is neither the issuer (i.e. job poster) nor the executor (i.e.job hunter) of the bounty for which execution details needed, then logged  in user should not be able to see the execution details
+Keying in invalid indices in input fields should result in an error. Indices are 0-based. If logged in user is not the job  poster of the bounty for which work submission details needed, then logged  in user should not be able to see the work submission details. If no work submissions are available then a message should be shown for this info
 
 ### Story 11
 
-#### Title: Bounty Issuer - Accept Bounty Work Details(i.e. accepted one of the work submissions obtained for a bounty)
+#### Title: Job  Poster - Accept Bounty Work Details(i.e. accepted one of the work submissions obtained for a bounty)
 
 #### Description: 
 	Login as someone other than contract owner. Enter numeric value in "Bounty ID" & "Bounty Work ID" fields. Click Accept Bounty Work button. Bounty Work should get accepted. Click Refresh this page button.
@@ -282,17 +282,17 @@ Keying in invalid indices in input fields should result in an error. Indices are
 
 ### Story 12
 
-#### Title: Bounty Executor (Job Hunter) - Collect Bounty Reward (i.e. a job hunter whose work for a bounty has been accepted by bounty issuer, should be able to collect reward)
+#### Title: Job Hunter - Collect Bounty Reward (i.e. a job hunter whose work for a bounty has been accepted by job poster, should be able to collect reward)
 
 #### Description: 
-	Login as someone other than contract owner. Enter numeric value in "Bounty ID" & "Bounty Execution ID" fields. 	Click Collect Bounty Reward button. Ether should get 	transferred from contract to the bounty executor (i.e. to the job hunter). Click Refresh this page button. 
+	Login as someone other than contract owner. Enter numeric value in "Bounty ID" & "Bounty Work ID" fields. 	Click Collect Bounty Reward button. Ether should get transferred from contract to the to the job hunter. Click Refresh this page button. 
 	
 #### Acceptance Criteria: 
 	
 Total count of bounties should remain unchanged.
 Status of bounty for which was accepted should remain as Closed. Reward value of bounty for which was work was accepted should remain unchanged
      
-Checking Bounty Work details (refer to story #10) should show that reward eligibility of job hunter has changed from a non-zero value to 0 (because ether has been transferred already and no more ether pertaining to this execution remains to be transferred to job hunter)
+Checking Bounty Work details (refer to story #10) should show that reward eligibility of job hunter has changed from a non-zero value to 0 (because ether has been transferred already and no more ether pertaining to this work submission remains to be transferred to job hunter)
 
 Trying to collect reward for a work that logged in user has not submitted should result in error 
 

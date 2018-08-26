@@ -72,9 +72,6 @@ function timeConverter(UNIX_timestamp){
 <label for="name">Bounty ID</label>
 <input id="bounty_id_for_review" type="number" min="0" step="1" oninput="validity.valid||(value='');">
 
-<label for="name">Bounty Work ID</label>
-<input id="bounty_execution_id_to_view" type="number" min="0" step="1" oninput="validity.valid||(value='');">
-
 <button id="button_get_bounty_execution_details">Review Proposed Work Submission</button>
 </div>
 
@@ -605,7 +602,6 @@ function setPageControlsVisibility(is_contract_stopped, user_EOA_address, contra
 		document.getElementById("bounty_id_to_be_enabled").disabled = true;
 		document.getElementById("bounty_id_for_review").disabled = true;
 		document.getElementById("bounty_id_under_review").disabled = true;
-		document.getElementById("bounty_execution_id_to_view").disabled = true;
 		document.getElementById("bounty_execution_id_to_be_accepted").disabled = true;
 		document.getElementById("bounty_id_to_be_executed").disabled = true;
 		document.getElementById("bounty_sow_response").disabled = true;
@@ -630,7 +626,6 @@ function setPageControlsVisibility(is_contract_stopped, user_EOA_address, contra
 			document.getElementById("bounty_id_to_be_enabled").disabled = false;
 			document.getElementById("bounty_id_for_review").disabled = false;
 			document.getElementById("bounty_id_under_review").disabled = false;
-			document.getElementById("bounty_execution_id_to_view").disabled = false;
 			document.getElementById("bounty_execution_id_to_be_accepted").disabled = false;
 			document.getElementById("bounty_id_to_be_executed").disabled = false;
 			document.getElementById("bounty_sow_response").disabled = false;
@@ -654,7 +649,6 @@ function setPageControlsVisibility(is_contract_stopped, user_EOA_address, contra
 			document.getElementById("bounty_id_to_be_enabled").disabled = true;
 			document.getElementById("bounty_id_for_review").disabled = true;
 			document.getElementById("bounty_id_under_review").disabled = true;
-			document.getElementById("bounty_execution_id_to_view").disabled = true;
 			document.getElementById("bounty_execution_id_to_be_accepted").disabled = true;
 			document.getElementById("bounty_id_to_be_executed").disabled = true;
 			document.getElementById("bounty_sow_response").disabled = true;
@@ -772,33 +766,55 @@ $("#button_enable_bounty").click(function() {
 	});
 
 
-$("#button_get_bounty_execution_details").click(function() {
-	var bountyId = document.getElementById("bounty_id_for_review").value;
-	var bountyExecutionId = document.getElementById("bounty_execution_id_to_view").value;
-	BountyPortal.getBountyExecution.call(bountyId, bountyExecutionId, {from: user_EOA_address}, function(error, result) {
-			if(!error) { 
-				console.log(result); 
-				var strBountyExecutionDetails = "Work Details for Bounty Id " + bountyId + " and Work Id: " + bountyExecutionId + "\n";
-				strBountyExecutionDetails += "Job Hunter: " + result[1];
-				strBountyExecutionDetails += "\n";
-				
-				strBountyExecutionDetails += "Submission Content: " + result[2];
-				strBountyExecutionDetails += "\n";
-
-				if (result[0] == false) {
-					strBountyExecutionDetails += "Work Status: Not Accepted Yet by Issuer"; 
-				} else {
-					strBountyExecutionDetails += "Work Status: Accepted by Issuer"; 
-				}
-				
-				strBountyExecutionDetails += "\n";
-				strBountyExecutionDetails += "Reward eligibility for Job Hunter : " + result[3] + " wei";
-				strBountyExecutionDetails += "\n";
-				window.alert(strBountyExecutionDetails);	
-	            	} else {
-				console.log("getBountyExecution Fail");
-	                	console.error(error);
+$("#button_get_bounty_execution_details").click(async function() {
+	var bountyId = document.getElementById("bounty_id_for_review").value;	
+	await BountyPortal.getBountyExecutionCount.call(bountyId, {from: user_EOA_address}, async function(error, result) {
+		if (!error) {
+			var arr = []
+			for (i=0; i < result; i++) {
+				arr.push(i);
 			}
+			console.log(arr);
+			if (arr.length == 0) {
+				window.alert("No work submitted for bounty id: " + bountyId);
+				return;
+			}
+			var strBountyExecutionDetails = "Following are " + arr.length + " Work Submissions for bounty id: " + bountyId + "\n";
+			for (const item of arr) {
+				
+				await BountyPortal.getBountyExecution.call(bountyId, item, {from: user_EOA_address}, function(err, res) {
+					if(!err) { 
+						console.log(res); 
+						strBountyExecutionDetails += "\nSubmission Id: " + item + "\n";
+						strBountyExecutionDetails += "Job Hunter: " + res[1];
+						strBountyExecutionDetails += "\n";
+				
+						strBountyExecutionDetails += "Submission Content: " + res[2];
+						strBountyExecutionDetails += "\n";
+	
+						if (res[0] == false) {
+							strBountyExecutionDetails += "Work Status: Not Accepted Yet by Issuer"; 
+						} else {
+							strBountyExecutionDetails += "Work Status: Accepted by Issuer"; 
+						}
+				
+						strBountyExecutionDetails += "\n";
+						strBountyExecutionDetails += "Reward eligibility for Job Hunter : " + res[3] + " wei";
+						strBountyExecutionDetails += "\n";
+						if (item == arr[arr.length-1]) {				
+							window.alert(strBountyExecutionDetails);
+						}
+	            			} else {
+						console.log("getBountyExecution Fail");
+	                			console.error(err);
+					}
+				});
+				}  //for
+			} else {
+				console.log("getBountyExecutionCount Fail");
+	                	console.error(error);	
+			}
+		
 		});	
 	});
 
